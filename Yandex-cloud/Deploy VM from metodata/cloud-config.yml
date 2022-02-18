@@ -1,0 +1,24 @@
+#cloud-config
+disable_root: true
+timezone: Europe/Moscow
+repo_update: true
+repo_upgrade: true
+
+users:
+    - name: vadglush
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      shell: /bin/bash
+      ssh-authorized-keys:
+        - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAekX1QOdJ3PUg19aeenvwhKGjLF24ado+X1CLu4ay1kPAXl2g/1QRHQYdmZQn2sYnhGcnXo/h56lP8Cb4lgUdl6Z6Hu9l+u32tyC3aumzSlET/BWUBSNaFjZyD5JEx0JWRJeQ+atYLlFnJRYf64EnzX1wsOaJ1w65ZrgS9rGvL4RcxUZoHRSI93ZG1IanGMhjq1zY9dGAG0gISZFqlXIqvo5WQtU83iF87wH/tr4jCKzuBrWFnhI/oa+7C+Y8yfq21W8Qfw2c0g9vM6pxcZP2iPzFXLC1jrJjhX3zCW3jpnZF33D+OrXLKQ7qkiL1Ib+TJy5EpCwhBJH2LkMkYjLQ4pDPFK9lhOVzPuLCSgusEdIj39ylzdyaYXuu9fO1j9F7gEKKEddcg/4Sc0Wb7CwXBKXXUECfP87qfxTkKYaJUv23nCu8zv82GsR5T4umH5I48v/9S8tEz7yMh6i/uq7kmxTVE3kC71B6eidKgqDHNNo8zE07H7JjuHR39IBiRMc= vadglush"
+
+#packeges:
+
+runcmd:
+    - [ mkdir, /tmp/install ]
+    - [ cd, /tmp/install ]
+    - [ wget, "https://raw.githubusercontent.com/vad-glush/Manual/master/Scripts/deploy_rabbit.sh" ]
+    - [ wget, "https://raw.githubusercontent.com/vad-glush/Manual/master/Scripts/install_mongodb.sh" ]
+    - [ wget, "https://raw.githubusercontent.com/vad-glush/Manual/master/Scripts/install_ruby.sh" ]
+    - [ bash, install_ruby.sh ]
+    - [ bash, install_mongodb.sh ]
+    - [ bash, deploy_rabbit.sh ]
