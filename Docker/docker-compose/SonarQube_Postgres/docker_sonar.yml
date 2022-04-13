@@ -20,6 +20,7 @@ services:
       - "9000:9000"
     networks:
       - sonarnet
+#Добавление в хостс
     extra_hosts:
       - "DOMAIN:IP"
     restart: always
