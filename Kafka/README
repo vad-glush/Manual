@@ -1,0 +1,8 @@
+Настройка kafka на экспорт метрик
+
+Скопировать файлы kafka-2_0_0.yml и jmx_prometheus_javaagent-0.15.0.jar в /usr/local/kafka/export
+
+Поправить файл /usr/local/kafka/bin/kafka-server-start.sh
+Добавить строку 
+export KAFKA_OPTS="-javaagent:/usr/local/kafka/export/jmx_prometheus_javaagent-0.15.0.jar=9404:/usr/local/kafka/export/kafka-2_0_0.yml"
+Рестарт kafka
