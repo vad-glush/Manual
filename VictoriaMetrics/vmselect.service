@@ -1,0 +1,14 @@
+[Unit]
+Description=VictoriaMetrics-Select
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+#User=prometheus
+#Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/VictoriaMetrics-v1.76.1/vmselect-prod \
+-storageNode=127.0.0.1:8401
+
+[Install]
+WantedBy=multi-user.target

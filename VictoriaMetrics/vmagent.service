@@ -1,0 +1,15 @@
+[Unit]
+Description=VictoriaMetrics-Agent
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+#User=prometheus
+#Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/VictoriaMetrics-v1.76.1/vmagent-prod \
+-promscrape.config=/usr/local/bin/VictoriaMetrics-v1.76.1/prometheus.yml \
+-remoteWrite.url=http://10.0.9.98:8480/insert/1/prometheus
+
+[Install]
+WantedBy=multi-user.target

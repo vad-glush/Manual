@@ -1,0 +1,27 @@
+Развёртывание VictoriaMetrics
+
+Скачиваем необходимые пакеты с https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.76.1
+Необходим:
+	- victoria-metrics-amd64-v1.76.1-cluster.tar.gz
+		○ vminsert-prod - принимает полученные данные и распределяет их между vmstorageузлами в соответствии с согласованным хешированием по имени метрики и всем ее меткам
+		○ vmselect-prod - выполняет входящие запросы, извлекая необходимые данные из всех настроенных vmstorageузлов
+		○ vmstorage-prod - сохраняет необработанные данные и возвращает запрошенные данные в заданном временном диапазоне для заданных фильтров меток
+	- vmutils-amd64-v1.76.1.tar.gz
+		○ Vmagent - это крошечный, но мощный агент, который помогает вам собирать метрики из различных источников и хранить их в VictoriaMetrics или любых других системах хранения, совместимых с Prometheus, поддерживающих remote_writeпротокол
+Разархивируем архив и кладем исполняемые файлы в необходимые директории
+Создаем сервисы:
+
+/etc/systemd/system/vminsert.service
+/etc/systemd/system/vmselect.service
+/etc/systemd/system/vmstorage.service
+/etc/systemd/system/vmagent.service
+
+Создаем файл prometheus.yml, который используется при запуске vmagent.service. VictoriaMetrics agent полностью поддерживает конфигурацию из Prometheus
+
+Добавляем все сервисы в автозагрузку
+$ systemctl enable vminsert.service
+$ systemctl enable vmselect.service
+$ systemctl enable vmstorage.service
+$ systemctl enable vmagent.service
+
+
