@@ -1,27 +1,83 @@
+______________________________________________________
+______________________________________________________
 Развёртывание VictoriaMetrics
 
-Скачиваем необходимые пакеты с https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.76.1
+Скачиваем необходимые пакеты с https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.76.1 
+
 Необходим:
-	- victoria-metrics-amd64-v1.76.1-cluster.tar.gz
-		○ vminsert-prod - принимает полученные данные и распределяет их между vmstorageузлами в соответствии с согласованным хешированием по имени метрики и всем ее меткам
-		○ vmselect-prod - выполняет входящие запросы, извлекая необходимые данные из всех настроенных vmstorageузлов
-		○ vmstorage-prod - сохраняет необработанные данные и возвращает запрошенные данные в заданном временном диапазоне для заданных фильтров меток
-	- vmutils-amd64-v1.76.1.tar.gz
-		○ Vmagent - это крошечный, но мощный агент, который помогает вам собирать метрики из различных источников и хранить их в VictoriaMetrics или любых других системах хранения, совместимых с Prometheus, поддерживающих remote_writeпротокол
+- victoria-metrics-amd64-v1.76.1-cluster.tar.gz
+	- vminsert-prod - принимает полученные данные и распределяет их между vmstorageузлами в соответствии с согласованным хешированием по имени метрики и всем ее меткам
+	- vmselect-prod - выполняет входящие запросы, извлекая необходимые данные из всех настроенных vmstorageузлов
+	- vmstorage-prod - сохраняет необработанные данные и возвращает запрошенные данные в заданном временном диапазоне для заданных фильтров меток
+- vmutils-amd64-v1.76.1.tar.gz
+	- Vmagent - это крошечный, но мощный агент, который помогает вам собирать метрики из различных источников и хранить их в VictoriaMetrics или любых других системах хранения, совместимых с Prometheus, поддерживающих remote_writeпротокол
 Разархивируем архив и кладем исполняемые файлы в необходимые директории
+____
 Создаем сервисы:
 
 /etc/systemd/system/vminsert.service
 /etc/systemd/system/vmselect.service
 /etc/systemd/system/vmstorage.service
 /etc/systemd/system/vmagent.service
-
+____
 Создаем файл prometheus.yml, который используется при запуске vmagent.service. VictoriaMetrics agent полностью поддерживает конфигурацию из Prometheus
 
 Добавляем все сервисы в автозагрузку
+
 $ systemctl enable vminsert.service
 $ systemctl enable vmselect.service
 $ systemctl enable vmstorage.service
 $ systemctl enable vmagent.service
+______________________________________________________
+______________________________________________________
+Сбор базовых данных с сиcтемы linux
+Для этого необходимо установить на сервере linux node_exporter
+
+$ wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+
+Извлечь двоичный файл node_exporter.
+$ tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
+
+Перейти в каталог, созданный во время извлечения.
+$ cd node_exporter-1.3.1.linux-amd64
+
+Сделать исполняемым файл node_exporter.
+chmod +x node_exporter
+
+Создать пользователя, от имени которого будет запускатся
+$ sudo useradd --no-create-home --shell /bin/false node_exporter
+
+И создать юнит файл systemd для её запуска:
+node_exporter.service
+
+[Unit]
+Description=Prometheus Node Exporter
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter --collector.systemd
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
+
+Зупустить и добавить в автозагрузку
+$ systemctl enable node_exporter.service
 
 
+P.S.: --collector.systemd - отвечает за дополнительный сбор метрик запущенных сервисов в системе
+______________________________________________________
+______________________________________________________
+Добавление приема метрик в VictoriaMetrics
+
+Необходимо внести правки в конфигурационный фйл prometheus.yml
+Добавить блок 
+- job_name: 'ИМЯ_СЕРВИСА'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['IP:PORT']
+
+Презапустить агент VictoriaMetrics
+$ systemctl restart vmagent.service
