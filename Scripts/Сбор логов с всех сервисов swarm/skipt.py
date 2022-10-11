@@ -5,6 +5,7 @@ host = 'IP'
 user = 'USER'
 secret = 'PASS'
 port = 22
+stack_name = 'PMP'
 client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 # Подключение
@@ -12,7 +13,7 @@ client.connect(hostname=host, username=user, password=secret, port=port)
 # Выполнение команды
 client.exec_command('mkdir /tmp/fromswarm/')
 subprocess.run(["sshpass", "-p", (secret), "scp", "get_stack_logs.sh", f"{user}@{host}:/tmp/fromswarm/get_stack_logs.sh"])
-stdin, stdout, stderr = client.exec_command('/tmp/fromswarm/get_stack_logs.sh PMP --since=2m --until=2s')
+stdin, stdout, stderr = client.exec_command(f'/tmp/fromswarm/get_stack_logs.sh {stack_name} --since=2m --until=2s')
 while True:
     print(stdout.read().decode(), end='')
     if stdout.channel.exit_status_ready():

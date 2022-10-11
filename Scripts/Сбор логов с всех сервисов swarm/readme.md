@@ -8,5 +8,5 @@ plink IP -ssh -batch -l USER -pw "PASS" "cd logs && ./get_stack_logs.sh PMP --si
 host = 'IPorNAME'
 user = 'USER'
 secret = 'PASSWORD'
-
+stack_name = имя стека
 Запусти skipt.py
