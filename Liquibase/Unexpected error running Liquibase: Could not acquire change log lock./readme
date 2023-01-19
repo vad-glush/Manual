@@ -1,0 +1,8 @@
+При попытке запуска обновления схемы базы данных через liquibase выходит ошибка:
+
+        Unexpected error running Liquibase: Could not acquire change log lock.
+        Currently locked by RTS-310816-RV26 (10.38.138.132) since 21.11.16 14:15
+
+Такая ошибка может возникнуть, если завершить процесс JVM во время работы liquibase. Снять блокировку, которая осталась после этого можно командой:
+
+        liquibase releaseLocks
