@@ -1,0 +1,18 @@
+sudo apt install gnupg2
+gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+
+curl -sSL https://get.rvm.io -o rvm.sh
+command curl -sSL https://rvm.io/mpapis.asc | gpg2 --import -
+command curl -sSL https://rvm.io/pkuczynski.asc | gpg2 --import -
+cat rvm.sh | bash -s stable --rails
+source /home/vadglush/.rvm/scripts/rvm
+sudo tee -a /etc/apt/sources.list <<< 'deb http://security.ubuntu.com/ubuntu bionic-security main'
+sudo apt update
+apt-cache policy libssl1.0-dev
+rvm install ruby-2.3.1
+rvm use 2.3.1 --default
+git clone -b monolith https://github.com/express42/reddit /home/vadglush/reddit
+cd /home/vadglush/reddit
+bundle install
+sudo systemctl start puma
+sudo systemctl enable puma
